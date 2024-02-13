@@ -1,0 +1,55 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model User {
+  id        Int         @id @default(autoincrement())
+  user_name String
+  email     String
+  password  String
+  contracts Contracts[]
+}
+
+model Contracts {
+  contracts_id      Int       @id @default(autoincrement())
+  Sever_id          Int
+  StartDate         DateTime  @updatedAt
+  EndDate           DateTime  @default(now())
+  MonthlyFee        Int
+  customer_contract Int
+  user_id           Int       @unique
+  user              User      @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  sever             Servers   @relation(fields: [Sever_id], references: [sever_id], onDelete: Cascade, onUpdate: Cascade)
+  payment           Payment[]
+}
+
+model Servers {
+  sever_id   Int         @id @default(autoincrement())
+  sever_name Int
+  ip_address Int
+  Location   Int
+  Status     String
+  contracts  Contracts[]
+}
+
+model Payment {
+  payment_id       Int       @id @default(autoincrement())
+  contract_id      Int
+  contract         Contracts @relation(fields: [contract_id], references: [contracts_id], onDelete: Cascade, onUpdate: Cascade)
+  payment_date     Int
+  amount           Int
+  contract_payment Int
+}
